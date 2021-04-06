@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}
+posts
+{% endblock title %}
+
+{% block content %}
+
+<style>
+    .header-buttons{
+        float: right;
+    }
+
+    .img-fluid{
+        max-width: 50%;
+        max-height: 50%;
+    }
+
+    .comment-auth{
+        float: right;
+    }
+
+    .comment-box{
+        display: none;
+    }
+</style>
+
+<script>
+    $( document ).ready(function() {
+        let display = false
+        $(".cmt_btn").click(function () {
+            if (display===false) {
+                $(this).next(".comment-box").show("slow");
+                display=true
+            } else {
+                $(this).next(".comment-box").hide("slow");
+                display=false
+            }  
+        });
+    });
+</script>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg">
+            {% for obj in qs %}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <a href={{obj.author.get_absolute_url}}>{{obj.author}}</a> <img class="rounded float-left mr-2" href ={{obj.author.get_absolute_url}} src={{obj.author.profile_img.url}} width="30" height="30" class="rounded" alt="img">
+                        <div class="header-buttons">
+                            {% ifequal request.user obj.author.user %}
+                                <a href="{% url 'posts:post-update' obj.pk %}"><button class="btn btn-info ">Update</button></a>
+                                <a href="{% url 'posts:post-delete' obj.pk %}"><button class="btn btn-warning ">Delete</button></a>
+                            {% endifequal %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="img-fluid " alt="">
+                            {% if obj.image %}
+                                <img src={{obj.image.url}} class="img-thumbnail">
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if obj.audio %}
+                                <audio controls>
+                                    <source src={{obj.audio.url}} type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                              </audio>
+                            {% endif %}
+                        </div>
+                        <div class="content">
+                            <p>{{obj.content}}</p>
+                        </div>
+                        <div class = "content float-right">
+                            
+                            <form action="{% url 'posts:like-post-view' %}" method="POST">
+                                    {%csrf_token%}
+                                    <input type="hidden" name = 'post_id' value={{obj.id}}>
+                                    <button type="submit" class="btn btn-light btn-sm mb-1">
+                                        {% if profile not in obj.liked.all %}
+                                            <i class="bi bi-hand-thumbs-up"></i>&nbsp;Like
+                                        {% else %}
+                                            <i class="bi bi-hand-thumbs-down"></i>&nbsp;Unlike
+                                        {% endif %}
+                                    </button>
+                                    &nbsp;{{obj.num_likes}}
+                            </form>
+                        
+                        </div>
+                        <button class="cmt_btn btn-secondary btn-sm float-top">Show / Hide comments</button>
+                        <div class="comment-box">
+                            {% if obj.comment_set.all %}
+                                {% for c in obj.comment_set.all %}
+                                
+                                <div class="card mt-2 mb-2 pt-2 pl-2">
+                                    <div class="comment-auth">
+                                        {{ c.user }} 
+                                        <img class="rounded float-left mr-2" src={{c.user.profile_img.url}} width="30" height="30" class="rounded" alt="img">
+                                    </div>
+                                    <hr></hr>
+                                    <p>{{c.body}}</p>
+                                </div>
+                                
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <form action="" method="POST" class="mt-3">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value={{obj.id}}>
+                            {{ c_form }}
+                            <button type="submit" class="btn btn-primary btn-sm" name="submit_c_form" >Comment</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col- mt-3">
+            <div style="width: 22rem;" class="card" >
+                <div class="card-body">
+                {% if post_added %}
+                    <p class="text-success">Posted!</p>
+                {% endif %}
+                <form action="" method="POST" class="align-text-bottom" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{p_form}}
+                    <button type="submit" class="btn btn-primary btn-sm mt-2" name="submit_p_form">Post</button>
+                </form>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="row">
+    <div class="col-sm-6">
+        {% for obj in album %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <a href={{obj.as_pro.get_absolute_url}}>{{obj.as_pro}} </a>Updated their favourite album! <img class="rounded float-left mr-2" href ={{obj.as_pro.get_absolute_url}} src={{obj.as_pro.profile_img.url}} width="30" height="30" class="rounded" alt="img">
+
+                </div>
+                <div class="card-body">
+                    <div class="img " alt="">
+                        {% if obj.album_art %}
+                            <img src={{obj.album_art.url}} class="img-thumbnail">
+                        {% endif %}
+                    </div>
+
+                    <div class="album_card">
+                        <p>{{obj.album_name}}</p>
+                        <p>{{obj.album_artist}}</p>
+                        <p>{{obj.album_genre}}</p>
+                    </div>
+                    <div class = "content float-right">
+                        
+                        <form action="{% url 'posts:like-post-view' %}" method="POST">
+                                {%csrf_token%}
+                                <input type="hidden" name = 'post_id' value={{obj.id}}>
+                                <button type="submit" class="btn btn-light btn-sm mb-1">
+                                    {% if profile not in obj.liked.all %}
+                                        <i class="bi bi-hand-thumbs-up"></i>&nbsp;Like
+                                    {% else %}
+                                        <i class="bi bi-hand-thumbs-down"></i>&nbsp;Unlike
+                                    {% endif %}
+                                </button>
+                                &nbsp;{{obj.num_likes}}
+                        </form>
+                    
+                    </div>
+                    <button class="cmt_btn btn-secondary btn-sm float-top">Show / Hide comments</button>
+                    <div class="comment-box">
+                        {% if obj.comment_set.all %}
+                            {% for c in obj.comment_set.all %}
+                            
+                            <div class="card mt-2 mb-2 pt-2 pl-2">
+                                <div class="comment-auth">
+                                    {{ c.user }} 
+                                    <img class="rounded float-left mr-2" src={{c.user.profile_img.url}} width="30" height="30" class="rounded" alt="img">
+                                </div>
+                                <hr></hr>
+                                <p>{{c.body}}</p>
+                            </div>
+                            
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <form action="" method="POST" class="mt-3">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value={{obj.id}}>
+                        {{ c_form }}
+                        <button type="submit" class="btn btn-primary btn-sm" name="submit_c_form" >Comment</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $( document ).ready(function() {
+        let display = false
+        $(".cmt_btn").click(function () {
+            if (display===false) {
+                $(this).next(".comment-box").show("slow");
+                display=true
+            } else {
+                $(this).next(".comment-box").hide("slow");
+                display=false
+            }  
+        });
+    });
+</script>
+{% endblock scripts %}
+
+
+    

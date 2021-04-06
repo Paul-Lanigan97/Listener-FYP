@@ -1,0 +1,47 @@
+<style>
+    .navbar{
+    margin-top: 0px;
+    padding: 0px;
+    width: 100%;
+}
+
+.name{
+    margin-top: 5mm;
+    margin-right: 10mm;
+    padding-right: 5px;
+    float: right;
+}
+
+</style>
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="{% url 'accounts:profile' %}">
+    <img src="https://i.imgur.com/K3P1NcR.png" width="60" height="60" alt="logo">
+    Listener</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'accounts:profile' %}">My Profile <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Friends
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'accounts:all_profiles_view' %}">All Profiles</a>
+          <a class="dropdown-item" href="{% url 'accounts:my_invites_view' %}">Invites &nbsp; <span class="badge badge-secondary">{{invites_num}}</span></a>
+          <a class="dropdown-item" href="{% url 'posts:main-post-view' %}">Posts </a>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  
+</nav>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+my invites
+{% endblock title %}
+
+{% block content %}
+    
+    {% if is_empty %}
+    <div class="container mt-2">
+        <div class="card" style="width: 40rem;">
+            <div class="card-body">
+                <h2>No friend requests available...</h2>
+            </div>   
+        </div>
+    </div>        
+    {% endif %}
+    
+   
+    {% for obj in qs %}
+        <div class="container mt-2">
+            <div class="card" style="width: 20rem;">
+                <div class="card-header">
+                    <h5 class="">{{obj.user}}</h5><img class="rounded float-left mr-2" src={{obj.profile_img.url}} width="64" height="64" class="rounded" alt="img">
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{obj.bio}}</p>
+                    <hr></hr>
+                    <a href={{obj.get_absolute_url}} class="btn btn-primary btn-sm">See Profile</a>
+                    
+                    <form action="{% url 'accounts:accept_invite' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                        <button type="submit" class="btn btn-success btn-sm mt-2">Accept Invite</button>
+                    </form>
+
+                    <form action="{% url 'accounts:reject_invite' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                        <button type="submit" class="btn btn-danger btn-sm mt-2">Reject Invite</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock content %}

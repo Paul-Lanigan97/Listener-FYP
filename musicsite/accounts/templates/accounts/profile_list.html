@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+all profiles
+{% endblock title %}
+
+{% block content %}
+    {% if is_empty %}
+        <h1>No profiles to interact</h1>
+    {% endif %}
+    
+    {% for obj in object_list %}
+     
+    <div class="container mt-3 ">
+        <div class="card" style="width: 30rem;">
+                <div class="card-header">
+                        <h5 class="">{{obj.user}}</h5><img class="rounded float-left mr-2" src={{obj.profile_img.url}} width="64" height="64" class="rounded" alt="img">
+                </div>
+                <div class="card-body">
+                        <p class="card-text">{{obj.bio}}</p>
+                        <a href={{obj.get_absolute_url}} class="btn btn-primary btn-sm">See Profile</a>
+                        
+                        {% if obj.user not in rel_receiver and obj.user not in rel_sender %}
+                                <form action="{% url 'accounts:send_invite' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                        <button type="submit" class="btn btn-success btn-sm mt-2">Add to Friends</button>  
+                                </form>
+                        {% endif %}
+                        
+                        {% if obj.user in rel_receiver and request.user not in obj.friends.all %}
+                                <button type="submit" class="btn btn-info btn-sm mt-2">Request Pending</button>
+                        {% endif %}
+
+                        {% if request.user in obj.friends.all %}
+                        <form action="{% url 'accounts:remove_friend' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value={{obj.pk}}>
+                                <button type="submit" class="btn btn-danger btn-sm mt-2">Remove from Friends</button>
+                        </form>
+                        {% endif %}
+                </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock content %}
